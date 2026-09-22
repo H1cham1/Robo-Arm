@@ -67,15 +67,17 @@ options = HandLandmarkerOptions(
     base_options=BaseOptions(model_asset_path=MODEL),
     running_mode=RunningMode.VIDEO,
     num_hands=1,
-    min_tracking_confidence=0.7,  # hoger = blijft de hand volgen i.p.v. elke frame opnieuw zoeken
+    # hoger = blijft de hand volgen i.p.v. elke frame opnieuw zoeken
+    min_tracking_confidence=0.7,
 )
 landmarker = HandLandmarker.create_from_options(options)
 
 cap = cv2.VideoCapture(0)
 if not cap.isOpened():
     print("Kan webcam niet openen (index 0).")
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)  # hogere resolutie vragen (webcam kiest dichtstbijzijnde)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+# hogere resolutie vragen (webcam kiest dichtstbijzijnde)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
 # venster op volledig scherm, beeldverhouding blijft behouden
 cv2.namedWindow("hand", cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
@@ -101,7 +103,8 @@ while cap.isOpened():
         coords = [(lm.x, lm.y, lm.z) for lm in result.hand_landmarks[0]]
         if smooth:
             coords = [
-                tuple(filters[i][axis](coords[i][axis], now) for axis in range(3))
+                tuple(filters[i][axis](coords[i][axis], now)
+                      for axis in range(3))
                 for i in range(21)
             ]
         points = [(int(x * w), int(y * h)) for x, y, _ in coords]
@@ -123,7 +126,8 @@ while cap.isOpened():
                 f.x_prev = None
 
     label = "smooth (f)" if smooth else "raw (f)"
-    cv2.putText(frame, label, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+    cv2.putText(frame, label, (10, 30),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
     cv2.imshow("hand", frame)
 
     key = cv2.waitKey(1) & 0xFF
