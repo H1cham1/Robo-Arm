@@ -74,6 +74,12 @@ landmarker = HandLandmarker.create_from_options(options)
 cap = cv2.VideoCapture(0)
 if not cap.isOpened():
     print("Kan webcam niet openen (index 0).")
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)  # hogere resolutie vragen (webcam kiest dichtstbijzijnde)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+
+# venster op volledig scherm, beeldverhouding blijft behouden
+cv2.namedWindow("hand", cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
+cv2.setWindowProperty("hand", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 timestamp_ms = 0
 smooth = True  # toets 'f' schakelt tussen gefilterd en rauw
 
